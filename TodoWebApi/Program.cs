@@ -1,6 +1,9 @@
 using TodoWebApi.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using TodoWebApi.Services;
+using System.Text;
 
 
 namespace TodoWebApi
@@ -10,6 +13,51 @@ namespace TodoWebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // JWT config
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(options =>
+            //    {
+            //        options.TokenValidationParameters = new TokenValidationParameters
+            //        {
+            //            ValidateIssuerSigningKey = true,
+            //            IssuerSigningKey = new SymmetricSecurityKey(
+            //                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+
+            //            ValidateIssuer = true,
+            //            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+            //            ValidateAudience = false,
+            //            ValidateLifetime = true
+            //        };
+            //    });
+            builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+            .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false; // TODO - Should be tru in production
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+            builder.Services.AddAuthorization(); // If i want to use [Authorize] later on
+
+
 
             // Add services to the container.
 
@@ -25,6 +73,7 @@ namespace TodoWebApi
 
             app.UseHttpsRedirection();
 
+            //app.UseAuthentication();
             app.UseAuthorization();
 
 

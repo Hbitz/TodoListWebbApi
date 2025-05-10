@@ -35,5 +35,22 @@ namespace TodoWebApi.Services
             await _context.SaveChangesAsync();
             return user;
         }
+
+        public async Task<User?> Login(string username, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            if (user == null) return null;
+
+            using var hmac = new HMACSHA512(user.passwordSalt);
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+            for (int i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != user.PasswordHash[i])
+                    return null;
+            }
+
+            return user;
+        }
     }
 }
