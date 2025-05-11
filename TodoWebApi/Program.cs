@@ -48,6 +48,7 @@ namespace TodoWebApi
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = true,
+                        //ValidateAudience = false,
                         ValidateAudience = true,
                         ValidIssuer = jwtSettings["Issuer"],
                         ValidAudience = jwtSettings["Audience"],
@@ -63,6 +64,7 @@ namespace TodoWebApi
 
             builder.Services.AddControllers();
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<TodoItemService>();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -73,7 +75,7 @@ namespace TodoWebApi
 
             app.UseHttpsRedirection();
 
-            //app.UseAuthentication();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
