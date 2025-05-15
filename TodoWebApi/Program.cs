@@ -18,40 +18,26 @@ namespace TodoWebApi
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuerSigningKey = true,
-            //            IssuerSigningKey = new SymmetricSecurityKey(
-            //                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-
-            //            ValidateIssuer = true,
-            //            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-
-            //            ValidateAudience = false,
-            //            ValidateLifetime = true
-            //        };
-            //    });
             builder.Services.AddAuthentication(options =>
                 {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default way of authentication, in this case JWT
+                    // This is what happens when user tries to reach an protected resource without authentication
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+                    // In simple terms - Each time user tries to access a controller/method with [Authorize], we will 
+
                 })
             .AddJwtBearer(options =>
                 {
-                    options.RequireHttpsMetadata = false; // TODO - Should be tru in production
-                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false; // Should be true in production to ensure tokens are only accepted via HTTPS
+                    options.SaveToken = true; // Saves token in HttpContext after user has been successfully authenticated
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = true,
-                        //ValidateAudience = false,
-                        ValidateAudience = true,
-                        ValidIssuer = jwtSettings["Issuer"],
-                        ValidAudience = jwtSettings["Audience"],
+                        ValidateIssuerSigningKey = true, // Validate the signature - so attackers can't create their own token
+                        IssuerSigningKey = new SymmetricSecurityKey(key), // The key that was used to sign token
+                        ValidateIssuer = true, // Validates that the issuer('iss') is what we expect it to be
+                        ValidateAudience = true, // Validates that the audience('aud') is what we expecte it to be
+                        ValidIssuer = jwtSettings["Issuer"], // The expected issues value in token
+                        ValidAudience = jwtSettings["Audience"], // Expected audience value in token
                         ClockSkew = TimeSpan.Zero
                     };
                 });

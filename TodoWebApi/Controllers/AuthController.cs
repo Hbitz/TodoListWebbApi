@@ -54,14 +54,16 @@ namespace TodoWebApi.Controllers
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
+                // Here we create our "claims" which identifies the user
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // Standard way to identify user id
+                    new Claim(ClaimTypes.Name, user.Username) // Store username
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(1), // How long this token should be valid
+                // Algorithm
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature),
-                Issuer = _configuration["Jwt:Issuer"],
+                Issuer = _configuration["Jwt:Issuer"], // 
                 Audience = _configuration["Jwt:Audience"]
             };
 

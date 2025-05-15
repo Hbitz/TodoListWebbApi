@@ -30,6 +30,7 @@ namespace TodoWebApi.Controllers
 
         [HttpPost]
         [Authorize]
+        // [FromBody] - takes data of the HTTP request and deserializes it to TodoItemDto todoDto
         public async Task<ActionResult<TodoItem>> CreateTodo([FromBody] TodoItemDto todoDto)
         {
             if (todoDto == null)
@@ -39,6 +40,7 @@ namespace TodoWebApi.Controllers
 
             var userId = GetUserId();
 
+            // Map the DOT to domain model
             var todoItem = new TodoItem
             {
                 Title = todoDto.Title,
@@ -48,6 +50,7 @@ namespace TodoWebApi.Controllers
             };
 
             var createdTodo = await _todoItemService.CreateTodoAsync(todoItem);
+            // Return a 201 crafted response which includes a route to retrieve the newly created todo
             return CreatedAtAction(nameof(GetTodos), new { id = createdTodo.Id }, createdTodo);
         }
 
@@ -118,17 +121,16 @@ namespace TodoWebApi.Controllers
         private int GetUserId()
         {
 
-            LogClaims();
-            // Kontrollera om User är null
+            // LogClaims();
             if (User == null)
             {
                 throw new Exception("User is null");
             }
 
+            // Attempts to gets the User id claim based from the two default naming values- First tries to get the claim from "name", and if it fails we attempt to get it from the longer default value.
             var userIdClaim = User?.Claims?.FirstOrDefault(c => c.Type == "nameid")?.Value
                 ?? User?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
 
-            // Kontrollera om claimen saknas
             if (string.IsNullOrEmpty(userIdClaim))
             {
                 throw new Exception("UserId claim not found.");
