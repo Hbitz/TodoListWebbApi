@@ -9,5 +9,9 @@
         public int UserId { get; set; }  // Foreign key to User
         public User User { get; set; }    // Navigation property to User
 
+        // FK and navigation property to Category
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; }
+
     }
 }

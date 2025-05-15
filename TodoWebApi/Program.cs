@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using TodoWebApi.Services;
+using TodoWebApi.Services.Interfaces;
 using System.Text;
 
 
@@ -51,6 +52,7 @@ namespace TodoWebApi
             builder.Services.AddControllers();
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<TodoItemService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

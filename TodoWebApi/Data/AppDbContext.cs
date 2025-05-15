@@ -9,7 +9,9 @@ namespace TodoWebApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TodoItem>()
-                .HasKey(t => t.Id);
+                .HasOne(t => t.Category)
+                .WithMany(c => c.TodoItems)
+                .HasForeignKey(t => t.CategoryId);
         }
 
         public DbSet<User> Users { get; set; }
