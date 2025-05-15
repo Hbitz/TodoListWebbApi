@@ -80,7 +80,7 @@ namespace TodoWebApi.Controllers
 
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<IActionResult> DelteTodo(int id)
+        public async Task<IActionResult> DeleteTodo(int id)
         {
             var userId = GetUserId();
             var success = await _todoItemService.DeleteTodoAsync(id, userId);
