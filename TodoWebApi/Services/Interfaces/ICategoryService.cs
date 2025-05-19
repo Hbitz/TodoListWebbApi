@@ -5,10 +5,13 @@ namespace TodoWebApi.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<CategoryDto>> GetAllAsync();
-        Task<CategoryDto?> GetByIdAsync(int id);
-        Task<CategoryDto> CreateAsync(CreateCategoryDto dto);
-        Task<bool> UpdateAsync(int id, CreateCategoryDto dto);
-        Task<bool> DeleteAsync(int id);
+        Task<List<CategoryDto>> GetAllAsync(int id);
+        Task<List<CategoryWithTodosDto>> GetAllWithTodosAsync(int userId);
+        Task<CategoryDto?> GetByIdAsync(int id, int userId);
+        Task<CategoryDto> CreateAsync(CreateCategoryDto dto, int userId);
+        Task<bool> UpdateAsync(int id, UpdateCategoryDto dto, int userId);
+        Task<bool> DeleteAsync(int id, int userId);
+        Task<bool> CategoryExistsAsync(int categoryId, int userId);
+        Task<Category?> GetCategoryByNameAsync(string name, int userId);
     }
 }

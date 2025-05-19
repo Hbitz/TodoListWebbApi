@@ -4,15 +4,31 @@ using TodoWebApi.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace TodoWebApi.Services
 {
     public class AuthService
     {
+        // Todo - Gradually move from existing implementation to UserManager
+        // A list of possible changes would be
+        /// <summary>
+        /// Combine ApplicationUser and Identity 
+        /// JWT auth logic - As long as we're only issuing tokens based on our rules and data there is no need for change
+        /// Controllers & Services - Could move away from old User class to consistent use of ApplicationUser
+        /// Token validation pipeline - Our middleware just validates tokens based on claims, not Identity, so no need for change
+        /// In summary - We have the implementation ready to go when we want to refactor/scale with complexity, features and protection.
+        /// But for now its OK.
+        /// </summary>
+
+        //private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _context;
 
-        public AuthService(AppDbContext context)
+        public AuthService(
+            //UserManager<ApplicationUser> userManager,
+            AppDbContext context)
         {
+            //_userManager = userManager;
             _context = context;
         }
         public async Task<bool> UserExist(string username)

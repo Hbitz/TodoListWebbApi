@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoWebApi.Data;
 
@@ -11,9 +12,11 @@ using TodoWebApi.Data;
 namespace TodoWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250516100939_MakeCategoriesUserSpecific")]
+    partial class MakeCategoriesUserSpecific
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,19 +238,15 @@ namespace TodoWebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Categories");
                 });
@@ -259,9 +258,6 @@ namespace TodoWebApi.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");
@@ -280,13 +276,14 @@ namespace TodoWebApi.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<string>("UserId1")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId1");
 
                     b.ToTable("TodoItems");
                 });
@@ -373,34 +370,24 @@ namespace TodoWebApi.Migrations
                         .WithMany("Categories")
                         .HasForeignKey("ApplicationUserId");
 
-                    b.HasOne("TodoWebApi.Models.User", "User")
+                    b.HasOne("TodoWebApi.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("TodoWebApi.Models.User", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("TodoWebApi.Models.TodoItem", b =>
                 {
-                    b.HasOne("TodoWebApi.Models.ApplicationUser", null)
-                        .WithMany("TodoItems")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("TodoWebApi.Models.Category", "Category")
                         .WithMany("TodoItems")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("TodoWebApi.Models.User", "User")
+                    b.HasOne("TodoWebApi.Models.ApplicationUser", "User")
                         .WithMany("TodoItems")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Category");
 
@@ -416,13 +403,6 @@ namespace TodoWebApi.Migrations
 
             modelBuilder.Entity("TodoWebApi.Models.Category", b =>
                 {
-                    b.Navigation("TodoItems");
-                });
-
-            modelBuilder.Entity("TodoWebApi.Models.User", b =>
-                {
-                    b.Navigation("Categories");
-
                     b.Navigation("TodoItems");
                 });
 #pragma warning restore 612, 618

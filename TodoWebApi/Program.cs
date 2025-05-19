@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using TodoWebApi.Services;
 using TodoWebApi.Services.Interfaces;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using TodoWebApi.Models;
 
 
 namespace TodoWebApi
@@ -45,7 +47,10 @@ namespace TodoWebApi
 
             builder.Services.AddAuthorization(); // If i want to use [Authorize] later on
 
-
+            // Adds Identity to the container. 
+            // Because it injects cookie-based authentication as its default auth scheme and we don't want to use neither that or it's JWT functionality right now, but keep testing with out own first, we comment it away.
+            //builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<AppDbContext>();
 
             // Add services to the container.
 

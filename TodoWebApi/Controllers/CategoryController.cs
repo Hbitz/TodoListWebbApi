@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TodoWebApi.Data;
+using TodoWebApi.DTOs;
 using TodoWebApi.Models;
+using TodoWebApi.Services.Interfaces;
 
 namespace TodoWebApi.Controllers
 {
@@ -12,77 +15,145 @@ namespace TodoWebApi.Controllers
     public class CategoryController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(AppDbContext context)
+        public CategoryController(AppDbContext context, ICategoryService categoryService)
         {
             _context = context;
+            _categoryService = categoryService;
         }
 
         // GET: api/category
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var userId = GetUserId();
+            var categories = await _categoryService.GetAllAsync(userId);
+            return Ok(categories);
+        }
+
+        // GET: api/category-with-todos
+        [HttpGet("with-todos")]
+        [Authorize]
+        //[Authorize]
+        public async Task<ActionResult<IEnumerable<CategoryWithTodosDto>>> GetCategoriesWithTodos()
+        {
+            var userId = GetUserId();
+            var categories = await _categoryService.GetAllWithTodosAsync(userId);
             return Ok(categories);
         }
 
         // GET: api/category/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var userId = GetUserId();
+            var category = await _categoryService.GetByIdAsync(id, userId);
+            //var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
             return Ok(category);
         }
+
         // POST: api/category
+        // Todo: Replacte Models with DTOs here and other controllers
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateCategory(Category category)
+        [Authorize]
+        public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto dto)
         {
-            if (category == null)
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
             {
-                return BadRequest();
+                return BadRequest("Category name is required.");
             }
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            var userId = GetUserId();
+
+            //var category = new Category
+            //{
+            //    Name = dto.Name,
+            //    UserId = GetUserId(), // set FK to the authenticated user
+            //};
+
+            //dto.UserId = userId;
+
+            var created = await _categoryService.CreateAsync(dto, userId);
+
+
+
+            //_context.Categories.Add(category);
+            //await _context.SaveChangesAsync();
 
             // return crafted 201 result with route to newly created category
-            return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
+            return CreatedAtAction(nameof(GetCategory), new { id = created.Id }, created);
         }
 
         // PUT api/category/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, Category category)
+        [Authorize]
+        public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto dto)
         {
-            var existingCategory = await _context.Categories.FindAsync(id);
-            if (existingCategory == null)
+            var userId = GetUserId();
+            var updated = await _categoryService.UpdateAsync(id, dto, userId);
+            if (!updated)
             {
                 return NotFound();
             }
-
-            existingCategory.Name = category.Name;
-
-            await _context.SaveChangesAsync();
             return NoContent();
+            //var existingCategory = await _categoryService.UpdateAsync(id, dto, userId);
+            ////var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
+            //if (existingCategory == null)
+            //{
+            //    return NotFound();
+            //}
+
+            ////existingCategory.Name = dto.Name;
+
+            ////await _context.SaveChangesAsync();
+            //return NoContent();
         }
 
         // DELETE: api/category/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var userId = GetUserId();
+            var deleted = await _categoryService.DeleteAsync(id, userId);
+            //var category = await _context.Categories.FindAsync(id);
+            if (!deleted)
             {
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            //_context.Categories.Remove(category);
+            //await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private int GetUserId()
+        {
+
+            // LogClaims();
+            if (User == null)
+            {
+                throw new Exception("User is null");
+            }
+
+            // Attempts to gets the User id claim based from the two default naming values- First tries to get the claim from "name", and if it fails we attempt to get it from the longer default value.
+            var userIdClaim = User?.Claims?.FirstOrDefault(c => c.Type == "nameid")?.Value
+                ?? User?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                throw new Exception("UserId claim not found.");
+            }
+
+            return int.Parse(userIdClaim);
         }
     }
 }

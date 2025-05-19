@@ -1,8 +1,7 @@
 ﻿namespace TodoWebApi.DTOs
 {
-    public class CreateCategoryDto
+    public class UpdateCategoryDto
     {
         public string Name { get; set; }
-        public int UserId { get; set; }
     }
 }

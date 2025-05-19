@@ -1,9 +1,9 @@
 ﻿namespace TodoWebApi.DTOs
 {
-    public class CategoryDto
+    public class CategoryWithTodosDto
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int TodoCount { get; set; }
+        public List<TodoItemDto> Todos { get; set; }
     }
 }

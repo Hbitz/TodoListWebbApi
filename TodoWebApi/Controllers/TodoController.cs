@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoWebApi.Models;
 using TodoWebApi.Services;
 using TodoWebApi.DTOs;
+using TodoWebApi.Services.Interfaces;
 
 namespace TodoWebApi.Controllers
 {
@@ -11,17 +12,19 @@ namespace TodoWebApi.Controllers
     public class TodoController : ControllerBase
     {
         private readonly TodoItemService _todoItemService;
+        private readonly ICategoryService _categoryService;
         private readonly int _userId;
 
-        public TodoController(TodoItemService todoItemService)
+        public TodoController(TodoItemService todoItemService, ICategoryService categoryService)
         {
             _todoItemService = todoItemService;
+            _categoryService = categoryService;
         }
 
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodos()
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos()
         {
             var userId = GetUserId();
             var todos = await _todoItemService.GetTodosAsync(userId);
@@ -31,7 +34,7 @@ namespace TodoWebApi.Controllers
         [HttpPost]
         [Authorize]
         // [FromBody] - takes data of the HTTP request and deserializes it to TodoItemDto todoDto
-        public async Task<ActionResult<TodoItem>> CreateTodo([FromBody] TodoItemDto todoDto)
+        public async Task<ActionResult<TodoItem>> CreateTodo([FromBody] CreateTodoDto todoDto)
         {
             if (todoDto == null)
             {
@@ -39,20 +42,58 @@ namespace TodoWebApi.Controllers
             }
 
             var userId = GetUserId();
+            int? resolvedCategoryId = null;
+
+            // Try get category by CategoryId if provided
+            if (todoDto.CategoryId.HasValue)
+            {
+                var exists = await _categoryService.CategoryExistsAsync(todoDto.CategoryId.Value, userId);
+                if (!exists)
+                {
+                    return BadRequest("Invalid category ID.");
+                }
+                resolvedCategoryId = todoDto.CategoryId;
+            }
+            // Else, try get category by Category name if provided
+            else if (!string.IsNullOrWhiteSpace(todoDto.CategoryName))
+            {
+                var category = await _categoryService.GetCategoryByNameAsync(todoDto.CategoryName, userId);
+                if (category == null)
+                {
+                    return BadRequest("Category name not found.");
+                }
+
+                resolvedCategoryId = category.Id;
+            }
+
+
 
             // Map the DOT to domain model
-            var todoItem = new TodoItem
+            // We use this to save to db
+            var todoDtoItem = new TodoItem
             {
                 Title = todoDto.Title,
                 Description = todoDto.Description,
                 IsCompleted = todoDto.IsCompleted,
                 UserId = userId,
+                CategoryId = resolvedCategoryId, // this will be null if no match
             };
 
-            var createdTodo = await _todoItemService.CreateTodoAsync(todoItem);
+            var createdTodo = await _todoItemService.CreateTodoAsync(todoDtoItem);
+
+            // Create a DTO that we return to user.
+            // This excludes the UserId, so we don't create infinite object cycle between User and Categories
+            var todoDtoResponse = new TodoItemDto
+            {
+                Title = todoDto.Title,
+                Description = todoDto.Description,
+                IsCompleted = todoDto.IsCompleted,
+                CategoryId = resolvedCategoryId
+            };
             // Return a 201 crafted response which includes a route to retrieve the newly created todo
-            return CreatedAtAction(nameof(GetTodos), new { id = createdTodo.Id }, createdTodo);
+            return CreatedAtAction(nameof(GetTodos), new { id = createdTodo.Id }, todoDtoResponse);
         }
+
 
         [HttpPut("{id}")]
         [Authorize]
@@ -65,16 +106,41 @@ namespace TodoWebApi.Controllers
 
             var userId = GetUserId();
 
-            var todoItem = new TodoItem
+            var existingTodo = await _todoItemService.GetTodoByIdAsync(id, userId);
+            if (existingTodo == null)
             {
-                Id = id,
-                Title = todoDto.Title,
-                Description = todoDto.Description,
-                IsCompleted = todoDto.IsCompleted,
-                UserId = userId
-            };
+                return NotFound($"Todo with ID {id} not found.");
+            }
 
-            var updatedTodo = await _todoItemService.UpdateTodoAsync(todoItem);
+            //Update the todo with our new values
+            existingTodo.Id = id;
+            existingTodo.Title = todoDto.Title;
+            existingTodo.Description = todoDto.Description;
+            existingTodo.IsCompleted = todoDto.IsCompleted;
+            existingTodo.UserId = userId;
+
+            // Try get category by CategoryId if provided
+            if (todoDto.CategoryId.HasValue)
+            {
+                var exists = await _categoryService.CategoryExistsAsync(todoDto.CategoryId.Value, _userId);
+                if (!exists)
+                {
+                    return BadRequest("Invalid category ID.");
+                }
+                existingTodo.CategoryId = todoDto.CategoryId;
+            }
+            // Else, try get category by Category name if provided
+            else if (!string.IsNullOrWhiteSpace(todoDto.CategoryName))
+            {
+                var category = await _categoryService.GetCategoryByNameAsync(todoDto.CategoryName, _userId);
+                if (category == null)
+                {
+                    return BadRequest("Category name not found.");
+                }
+                existingTodo.CategoryId = category.Id;
+            }
+
+            var updatedTodo = await _todoItemService.UpdateTodoAsync(existingTodo);
             return Ok(updatedTodo);
         }
 

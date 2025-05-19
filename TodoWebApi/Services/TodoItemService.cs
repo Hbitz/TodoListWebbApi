@@ -2,6 +2,7 @@
 using TodoWebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
+using TodoWebApi.DTOs;
 namespace TodoWebApi.Services
 {
     public class TodoItemService
@@ -13,11 +14,23 @@ namespace TodoWebApi.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<TodoItem>> GetTodosAsync(int userId)
+        public async Task<IEnumerable<TodoItemDto>> GetTodosAsync(int userId)
         {
-            return await _context.TodoItems
+            var todos = await _context.TodoItems
+                .Include(t => t.Category)
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
+            //return todos;
+
+            return todos.Select(todo => new TodoItemDto
+            {
+                Id = todo.Id,
+                Title = todo.Title,
+                Description = todo.Description,
+                IsCompleted = todo.IsCompleted,
+                CategoryId = todo.CategoryId,
+                CategoryName = todo.Category?.Name
+            });
         }
 
         public async Task<TodoItem> CreateTodoAsync(TodoItem todo)
@@ -44,6 +57,11 @@ namespace TodoWebApi.Services
             _context.TodoItems.Remove(todo);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<TodoItem?> GetTodoByIdAsync(int id, int userId)
+        {
+            return await _context.TodoItems.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
     }
 }
