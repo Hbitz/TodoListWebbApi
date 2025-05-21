@@ -71,10 +71,7 @@ namespace TodoWebApi.Services
 
         public async Task<CategoryDto?> GetByIdAsync(int id, int userId)
         {
-            // TODO: compare
-            //var category = await _context.Categories.Where(c => c.Id == id && c.UserId == userId).FirstOrDefaultAsync();
             var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
-            //var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
                 return null;
@@ -89,7 +86,6 @@ namespace TodoWebApi.Services
 
         public async Task<CategoryDto> CreateAsync(CreateCategoryDto dto, int userId)
         {
-
             var category = new Category
             {
                 Name = dto.Name,
@@ -139,8 +135,6 @@ namespace TodoWebApi.Services
 
         public async Task<Category?> GetCategoryByNameAsync(string name, int userId)
         {
-            Console.WriteLine($"Looking for category '{name}' for user ID {userId}");
-
             return await _context.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower() && c.UserId == userId);
         }
     }

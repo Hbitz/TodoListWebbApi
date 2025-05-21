@@ -66,8 +66,6 @@ namespace TodoWebApi.Controllers
                 resolvedCategoryId = category.Id;
             }
 
-
-
             // Map the DOT to domain model
             // We use this to save to db
             var todoDtoItem = new TodoItem
@@ -182,18 +180,15 @@ namespace TodoWebApi.Controllers
             }
         }
 
-
-
         private int GetUserId()
         {
-
             // LogClaims();
             if (User == null)
             {
                 throw new Exception("User is null");
             }
 
-            // Attempts to gets the User id claim based from the two default naming values- First tries to get the claim from "name", and if it fails we attempt to get it from the longer default value.
+            // Attempts to gets the User id claim based from the two default naming values - First tries to get the claim from "name", and if it fails we attempt to get it from the longer default value.
             var userIdClaim = User?.Claims?.FirstOrDefault(c => c.Type == "nameid")?.Value
                 ?? User?.Claims?.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
 
@@ -201,10 +196,7 @@ namespace TodoWebApi.Controllers
             {
                 throw new Exception("UserId claim not found.");
             }
-
             return int.Parse(userIdClaim);
         }
-
-
     }
 }

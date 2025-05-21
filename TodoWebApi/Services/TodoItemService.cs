@@ -13,14 +13,12 @@ namespace TodoWebApi.Services
         {
             _context = context;
         }
-
         public async Task<IEnumerable<TodoItemDto>> GetTodosAsync(int userId)
         {
             var todos = await _context.TodoItems
                 .Include(t => t.Category)
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
-            //return todos;
 
             return todos.Select(todo => new TodoItemDto
             {
@@ -32,7 +30,6 @@ namespace TodoWebApi.Services
                 CategoryName = todo.Category?.Name
             });
         }
-
         public async Task<TodoItem> CreateTodoAsync(TodoItem todo)
         {
             _context.TodoItems.Add(todo);

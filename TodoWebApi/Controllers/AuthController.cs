@@ -63,7 +63,7 @@ namespace TodoWebApi.Controllers
                 Expires = DateTime.UtcNow.AddHours(1), // How long this token should be valid
                 // Algorithm
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature),
-                Issuer = _configuration["Jwt:Issuer"], // 
+                Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"]
             };
 

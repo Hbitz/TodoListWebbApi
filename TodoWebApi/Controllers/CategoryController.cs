@@ -36,7 +36,6 @@ namespace TodoWebApi.Controllers
         // GET: api/category-with-todos
         [HttpGet("with-todos")]
         [Authorize]
-        //[Authorize]
         public async Task<ActionResult<IEnumerable<CategoryWithTodosDto>>> GetCategoriesWithTodos()
         {
             var userId = GetUserId();
@@ -51,7 +50,6 @@ namespace TodoWebApi.Controllers
         {
             var userId = GetUserId();
             var category = await _categoryService.GetByIdAsync(id, userId);
-            //var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
                 return NotFound();
@@ -71,23 +69,8 @@ namespace TodoWebApi.Controllers
             }
 
             var userId = GetUserId();
-
-            //var category = new Category
-            //{
-            //    Name = dto.Name,
-            //    UserId = GetUserId(), // set FK to the authenticated user
-            //};
-
-            //dto.UserId = userId;
-
             var created = await _categoryService.CreateAsync(dto, userId);
 
-
-
-            //_context.Categories.Add(category);
-            //await _context.SaveChangesAsync();
-
-            // return crafted 201 result with route to newly created category
             return CreatedAtAction(nameof(GetCategory), new { id = created.Id }, created);
         }
 
@@ -103,17 +86,6 @@ namespace TodoWebApi.Controllers
                 return NotFound();
             }
             return NoContent();
-            //var existingCategory = await _categoryService.UpdateAsync(id, dto, userId);
-            ////var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId);
-            //if (existingCategory == null)
-            //{
-            //    return NotFound();
-            //}
-
-            ////existingCategory.Name = dto.Name;
-
-            ////await _context.SaveChangesAsync();
-            //return NoContent();
         }
 
         // DELETE: api/category/5
@@ -123,21 +95,15 @@ namespace TodoWebApi.Controllers
         {
             var userId = GetUserId();
             var deleted = await _categoryService.DeleteAsync(id, userId);
-            //var category = await _context.Categories.FindAsync(id);
             if (!deleted)
             {
                 return NotFound();
             }
-
-            //_context.Categories.Remove(category);
-            //await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
         private int GetUserId()
         {
-
             // LogClaims();
             if (User == null)
             {
