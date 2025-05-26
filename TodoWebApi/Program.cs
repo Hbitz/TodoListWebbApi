@@ -7,6 +7,9 @@ using TodoWebApi.Services.Interfaces;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using TodoWebApi.Models;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using TodoWebApi.Filters;
 
 
 namespace TodoWebApi
@@ -45,16 +48,29 @@ namespace TodoWebApi
                     };
                 });
 
-            builder.Services.AddAuthorization(); // If i want to use [Authorize] later on
+            builder.Services.AddAuthorization(); // For when we want to use [Authorize] requirement on Controller methods
+
+
 
             // Adds Identity to the container. 
             // Because it injects cookie-based authentication as its default auth scheme and we don't want to use neither that or it's JWT functionality right now, but keep testing with out own first, we comment it away.
             //builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<AppDbContext>();
 
+
+
             // Add services to the container.
 
-            builder.Services.AddControllers();
+
+            // FluentValidation
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+            // FluentValidation Filter
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<ValidationFilter>();
+            });
+
+
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<TodoItemService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
