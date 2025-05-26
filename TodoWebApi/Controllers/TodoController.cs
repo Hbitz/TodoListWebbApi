@@ -24,10 +24,10 @@ namespace TodoWebApi.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos()
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos([FromQuery] TodoQueryParameters queryParams)
         {
             var userId = GetUserId();
-            var todos = await _todoItemService.GetTodosAsync(userId);
+            var todos = await _todoItemService.GetTodosAsync(userId, queryParams);
             return Ok(todos);
         }
 

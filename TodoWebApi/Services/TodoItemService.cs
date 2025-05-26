@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using TodoWebApi.DTOs;
 namespace TodoWebApi.Services
 {
+    // TODO - Implement ITodoItemService
     public class TodoItemService
     {
         private readonly AppDbContext _context;
@@ -13,12 +14,32 @@ namespace TodoWebApi.Services
         {
             _context = context;
         }
-        public async Task<IEnumerable<TodoItemDto>> GetTodosAsync(int userId)
+        public async Task<IEnumerable<TodoItemDto>> GetTodosAsync(int userId, TodoQueryParameters queryParams)
         {
-            var todos = await _context.TodoItems
+            var query = _context.TodoItems
                 .Include(t => t.Category)
                 .Where(t => t.UserId == userId)
-                .ToListAsync();
+                .AsQueryable(); // Returns a IQueryable-object that we can keep chain commands such as filter and sroting.
+
+
+            // Filter
+            if (!string.IsNullOrEmpty(queryParams.Category))
+            {
+                query = query.Where(t => t.Category.Name == queryParams.Category);
+            }
+
+            // Sorting
+            if (queryParams.SortOrder?.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(t => t.Id);
+            }
+            else
+            {
+                query = query.OrderBy(t => t.Id);
+            }
+
+            var todos = await query.ToListAsync();
+
 
             return todos.Select(todo => new TodoItemDto
             {
@@ -30,6 +51,7 @@ namespace TodoWebApi.Services
                 CategoryName = todo.Category?.Name
             });
         }
+
         public async Task<TodoItem> CreateTodoAsync(TodoItem todo)
         {
             _context.TodoItems.Add(todo);
