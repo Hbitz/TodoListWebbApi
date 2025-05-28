@@ -24,6 +24,8 @@ namespace TodoWebApi.Controllers
         // GET: api/category
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<CategoryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
         {
             var userId = GetUserId();
@@ -34,6 +36,8 @@ namespace TodoWebApi.Controllers
         // GET: api/category-with-todos
         [HttpGet("with-todos")]
         [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<CategoryWithTodosDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<CategoryWithTodosDto>>> GetCategoriesWithTodos()
         {
             var userId = GetUserId();
@@ -44,6 +48,9 @@ namespace TodoWebApi.Controllers
         // GET: api/category/{id}
         [HttpGet("{id}")]
         [Authorize]
+        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CategoryDto>> GetCategory(int id)
         {
             var userId = GetUserId();
@@ -58,6 +65,8 @@ namespace TodoWebApi.Controllers
         // POST: api/category
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto dto)
         {
             var userId = GetUserId();
@@ -69,6 +78,9 @@ namespace TodoWebApi.Controllers
         // PUT api/category/{id}
         [HttpPut("{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto dto)
         {
             var userId = GetUserId();
@@ -83,6 +95,9 @@ namespace TodoWebApi.Controllers
         // DELETE: api/category/{id}
         [HttpDelete("{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var userId = GetUserId();

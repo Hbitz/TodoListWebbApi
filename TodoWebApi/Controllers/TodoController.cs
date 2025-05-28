@@ -23,6 +23,8 @@ namespace TodoWebApi.Controllers
         // GET: api/todo
         [HttpGet]
         [Authorize]
+        [ProducesResponseType(typeof(IEnumerable<TodoItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos([FromQuery] TodoQueryParameters queryParams)
         {
             var userId = GetUserId();
@@ -33,6 +35,9 @@ namespace TodoWebApi.Controllers
         // POST: api/todo
         [HttpPost]
         [Authorize]
+        [ProducesResponseType(typeof(TodoItemDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         // [FromBody] - takes data of the HTTP request and deserializes it to TodoItemDto todoDto
         public async Task<ActionResult<TodoItem>> CreateTodo([FromBody] CreateTodoDto todoDto)
         {
@@ -90,6 +95,10 @@ namespace TodoWebApi.Controllers
         // PUT api/todo/{id}
         [HttpPut("{id}")]
         [Authorize]
+        [ProducesResponseType(typeof(TodoItem), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<TodoItem>> UpdateTodo(int id, [FromBody] TodoItemDto todoDto)
         {
             var userId = GetUserId();
@@ -135,6 +144,9 @@ namespace TodoWebApi.Controllers
         // DELETE: api/todo/{id}
         [HttpDelete("{id}")]
         [Authorize]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> DeleteTodo(int id)
         {
             var userId = GetUserId();
