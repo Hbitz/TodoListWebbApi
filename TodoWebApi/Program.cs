@@ -26,7 +26,7 @@ namespace TodoWebApi
 
             builder.Services.AddAuthentication(options =>
                 {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Default way of authentication, in this case JWT
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // Sets the default way of authentication, in this case JWT
                     // This is what happens when user tries to reach an protected resource without authentication
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
                     // In simple terms - Each time user tries to access a controller/method with [Authorize], we will 
@@ -89,7 +89,7 @@ namespace TodoWebApi
             });
 
             // Adds Identity to the container. 
-            // Because it injects cookie-based authentication as its default auth scheme and we don't want to use neither that or it's JWT functionality right now, but keep testing with out own first, we comment it away.
+            // Because it injects cookie-based authentication as its default auth scheme and we don't want to use neither that or it's JWT functionality right now, we comment it away and can easily transition to it later on.
             //builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             //    .AddEntityFrameworkStores<AppDbContext>();
 
@@ -105,7 +105,6 @@ namespace TodoWebApi
             {
                 options.Filters.Add<ValidationFilter>();
             });
-
 
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<TodoItemService>();

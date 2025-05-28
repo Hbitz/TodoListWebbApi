@@ -43,7 +43,7 @@ namespace TodoWebApi.Controllers
             return Ok(categories);
         }
 
-        // GET: api/category/5
+        // GET: api/category/{id}
         [HttpGet("{id}")]
         [Authorize]
         public async Task<ActionResult<CategoryDto>> GetCategory(int id)
@@ -58,7 +58,6 @@ namespace TodoWebApi.Controllers
         }
 
         // POST: api/category
-        // Todo: Replacte Models with DTOs here and other controllers
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto dto)
@@ -74,7 +73,7 @@ namespace TodoWebApi.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = created.Id }, created);
         }
 
-        // PUT api/category/5
+        // PUT api/category/{id}
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto dto)
@@ -88,7 +87,7 @@ namespace TodoWebApi.Controllers
             return NoContent();
         }
 
-        // DELETE: api/category/5
+        // DELETE: api/category/{id}
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteCategory(int id)

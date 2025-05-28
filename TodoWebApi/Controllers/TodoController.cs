@@ -21,7 +21,7 @@ namespace TodoWebApi.Controllers
             _categoryService = categoryService;
         }
 
-
+        // GET: api/todo
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos([FromQuery] TodoQueryParameters queryParams)
@@ -31,6 +31,7 @@ namespace TodoWebApi.Controllers
             return Ok(todos);
         }
 
+        // POST: api/todo
         [HttpPost]
         [Authorize]
         // [FromBody] - takes data of the HTTP request and deserializes it to TodoItemDto todoDto
@@ -92,7 +93,7 @@ namespace TodoWebApi.Controllers
             return CreatedAtAction(nameof(GetTodos), new { id = createdTodo.Id }, todoDtoResponse);
         }
 
-
+        // PUT api/todo/{id}
         [HttpPut("{id}")]
         [Authorize]
         public async Task<ActionResult<TodoItem>> UpdateTodo(int id, [FromBody] TodoItemDto todoDto)
@@ -142,6 +143,7 @@ namespace TodoWebApi.Controllers
             return Ok(updatedTodo);
         }
 
+        // DELETE: api/todo/{id}
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> DeleteTodo(int id)
@@ -155,6 +157,7 @@ namespace TodoWebApi.Controllers
             return NoContent();
         }
 
+        // Unused, safe to remove
         [HttpGet("test")]
         [Authorize]
         public ActionResult<string> GetUserIdFromToken()
@@ -170,7 +173,8 @@ namespace TodoWebApi.Controllers
             }
         }
 
-        // Helper method to log claim information in case of errors regarding claims
+        // Helper method  - used in GetUserId, to log claim information in case of errors regarding claims
+        // Unused, safe to remove
         private void LogClaims()
         {
             var claims = User.Claims;
