@@ -37,11 +37,6 @@ namespace TodoWebApi.Controllers
         // [FromBody] - takes data of the HTTP request and deserializes it to TodoItemDto todoDto
         public async Task<ActionResult<TodoItem>> CreateTodo([FromBody] CreateTodoDto todoDto)
         {
-            if (todoDto == null)
-            {
-                return BadRequest("Invalid data");
-            }
-
             var userId = GetUserId();
             int? resolvedCategoryId = null;
 
@@ -98,11 +93,6 @@ namespace TodoWebApi.Controllers
         [Authorize]
         public async Task<ActionResult<TodoItem>> UpdateTodo(int id, [FromBody] TodoItemDto todoDto)
         {
-            if (todoDto == null)
-            {
-                return BadRequest("Invalid data");
-            }
-
             var userId = GetUserId();
 
             var existingTodo = await _todoItemService.GetTodoByIdAsync(id, userId);

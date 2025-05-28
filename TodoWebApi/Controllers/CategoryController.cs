@@ -60,11 +60,6 @@ namespace TodoWebApi.Controllers
         [Authorize]
         public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto dto)
         {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
-            {
-                return BadRequest("Category name is required.");
-            }
-
             var userId = GetUserId();
             var created = await _categoryService.CreateAsync(dto, userId);
 
