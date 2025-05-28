@@ -83,6 +83,7 @@ namespace TodoWebApi.Controllers
             // This excludes the UserId, so we don't create infinite object cycle between User and Categories
             var todoDtoResponse = new TodoItemDto
             {
+                Id = createdTodo.Id,
                 Title = todoDto.Title,
                 Description = todoDto.Description,
                 IsCompleted = todoDto.IsCompleted,
