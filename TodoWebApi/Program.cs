@@ -10,6 +10,7 @@ using TodoWebApi.Models;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TodoWebApi.Filters;
+using Microsoft.OpenApi.Models;
 
 
 namespace TodoWebApi
@@ -87,6 +88,18 @@ namespace TodoWebApi
                     }
                 });
             });
+
+            // Swagger - add title/version info
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Todo Web API",
+                    Version = "v1",
+                    Description = "Learning project with JWT, EF Core, Swagger, etc."
+                });
+            });
+
 
             // Adds Identity to the container. 
             // Because it injects cookie-based authentication as its default auth scheme and we don't want to use neither that or it's JWT functionality right now, we comment it away and can easily transition to it later on.
