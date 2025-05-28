@@ -14,12 +14,10 @@ namespace TodoWebApi.Controllers
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly ICategoryService _categoryService;
 
-        public CategoryController(AppDbContext context, ICategoryService categoryService)
+        public CategoryController(ICategoryService categoryService)
         {
-            _context = context;
             _categoryService = categoryService;
         }
 
