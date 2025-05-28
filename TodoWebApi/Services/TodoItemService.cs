@@ -3,10 +3,11 @@ using TodoWebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using TodoWebApi.DTOs;
+using TodoWebApi.Services.Interfaces;
 namespace TodoWebApi.Services
 {
     // TODO - Implement ITodoItemService
-    public class TodoItemService
+    public class TodoItemService : ITodoItemService
     {
         private readonly AppDbContext _context;
 

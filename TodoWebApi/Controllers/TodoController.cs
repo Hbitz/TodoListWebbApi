@@ -11,11 +11,11 @@ namespace TodoWebApi.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase
     {
-        private readonly TodoItemService _todoItemService;
+        private readonly ITodoItemService _todoItemService;
         private readonly ICategoryService _categoryService;
         private readonly int _userId;
 
-        public TodoController(TodoItemService todoItemService, ICategoryService categoryService)
+        public TodoController(ITodoItemService todoItemService, ICategoryService categoryService)
         {
             _todoItemService = todoItemService;
             _categoryService = categoryService;

@@ -120,7 +120,7 @@ namespace TodoWebApi
             });
 
             builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<TodoItemService>();
+            builder.Services.AddScoped<ITodoItemService, TodoItemService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
