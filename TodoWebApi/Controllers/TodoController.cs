@@ -13,7 +13,6 @@ namespace TodoWebApi.Controllers
     {
         private readonly ITodoItemService _todoItemService;
         private readonly ICategoryService _categoryService;
-        private readonly int _userId;
 
         public TodoController(ITodoItemService todoItemService, ICategoryService categoryService)
         {
@@ -111,7 +110,7 @@ namespace TodoWebApi.Controllers
             // Try get category by CategoryId if provided
             if (todoDto.CategoryId.HasValue)
             {
-                var exists = await _categoryService.CategoryExistsAsync(todoDto.CategoryId.Value, _userId);
+                var exists = await _categoryService.CategoryExistsAsync(todoDto.CategoryId.Value, userId);
                 if (!exists)
                 {
                     return BadRequest("Invalid category ID.");
@@ -121,7 +120,7 @@ namespace TodoWebApi.Controllers
             // Else, try get category by Category name if provided
             else if (!string.IsNullOrWhiteSpace(todoDto.CategoryName))
             {
-                var category = await _categoryService.GetCategoryByNameAsync(todoDto.CategoryName, _userId);
+                var category = await _categoryService.GetCategoryByNameAsync(todoDto.CategoryName, userId);
                 if (category == null)
                 {
                     return BadRequest("Category name not found.");
