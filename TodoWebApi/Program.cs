@@ -128,11 +128,11 @@ namespace TodoWebApi
 
             var app = builder.Build();
 
-            // Seed the database, if empty.
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                await SeedService.SeedAsync(dbContext);
+                dbContext.Database.Migrate(); // Runs migrations automatically
+                await SeedService.SeedAsync(dbContext); // Seeds the database, if empty
             }
 
             // Only show swagger if in dev
